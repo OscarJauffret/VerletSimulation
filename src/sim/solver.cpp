@@ -4,7 +4,7 @@
 
 #include "headers/solver.hpp"
 
-uint64_t
+int64_t
 Solver::addObject(Vector2<double> position, double radius, int64_t constrainedToId, bool renderTrail, Color color) {
     objects.emplace_back(position, radius, constrainedToId, renderTrail, color);
     return objects.size() - 1;

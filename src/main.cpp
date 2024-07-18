@@ -4,14 +4,11 @@
 #include "config.hpp"
 #include "sim/headers/solver.hpp"
 #include "renderer.hpp"
-#include "rng/rng.hpp"
 
-#define M_PI 3.14159265359
+void spawnDoublePendulum(Solver &solver, Vector2<double> firstBallPos, Vector2<double> secondBallPos,
+                         double objectRadius, int i);
 
-void spawnDoublePendulum(Solver &solver, const Vector2<double> firstBallPos, const Vector2<double> secondBallPos,
-                         const double objectRadius, int i);
-
-Vector2<double> calculateObjectSpawnPositionBasedOnAngle(double angle, Vector2<double> vector2, const double radius);
+Vector2<double> calculateObjectSpawnPositionBasedOnAngle(double angle, Vector2<double> vector2, double radius);
 
 using namespace sf;
 using namespace std;
@@ -25,14 +22,28 @@ static sf::Color getRainbow(double t) {
             static_cast<uint8_t>(255.0f * b * b)};
 }
 
+static sf::Color getGreenToBlue(double t) {
+    // t should be between 0 and 1
+    const double g = sin(t * M_PI); // Green goes from 0 to 1 to 0
+    const double b = cos(t * M_PI); // Blue goes from 1 to 0 to 1
+    return {static_cast<uint8_t>(73),
+            static_cast<uint8_t>(255.0f * g * g),
+            static_cast<uint8_t>(219)};
+}
+
 static sf::Color getRainbowByIndex(int index, int total) {
     double t = static_cast<double>(index) / total;
     return getRainbow(t * 2.0 * M_PI);
 }
 
+static sf::Color getGreenToBlueByIndex(int index, int total) {
+    double t = static_cast<double>(index) / total;
+    return getGreenToBlue(t);
+}
+
 // Set simulation attributes
-const double objectRadius = 1.0f;
-const int objectCount = 200;
+const double objectRadius = 2.0f;
+const int objectCount = 50;
 
 int main() {
     RenderWindow window(VideoMode(config::windowWidth, config::windowHeight),
@@ -56,7 +67,7 @@ int main() {
     Vector2<double> secondBallPos;
     int i = 0;
     while (i < objectCount) {
-        angle += 1e-9;
+        angle += 1e-10;
         firstBallPos = calculateObjectSpawnPositionBasedOnAngle(angle, constraintCenter, constraintRadius);
         secondBallPos = calculateObjectSpawnPositionBasedOnAngle(angle, constraintCenter, constraintRadius * 2);
         spawnDoublePendulum(solver, firstBallPos, secondBallPos, objectRadius, i);
@@ -88,5 +99,5 @@ void spawnDoublePendulum(Solver &solver, const Vector2<double> firstBallPos, con
                          const double objectRadius, int i) {
     int64_t objectId = solver.addObject(firstBallPos, 0);
     solver.addObject(secondBallPos, objectRadius, objectId,
-                     true, getRainbowByIndex(i, objectCount));
+                     true, getGreenToBlueByIndex(i, objectCount));
 }

@@ -26,7 +26,8 @@ class Solver {
 
 public:
     Solver() = default;
-    uint64_t addObject(Vector2<double> position, double radius, int64_t constrainedToId = -1, bool renderTrail = false, Color color = Color::White);
+    int64_t
+    addObject(Vector2<double> position, double radius, int64_t constrainedToId = -1, bool renderTrail = false, Color color = Color::White);
     void setSubSteps(uint32_t steps);
     void setSimulationUpdateRate(uint32_t rate);
     void setConstraint(Vector2<double> center, double radius);

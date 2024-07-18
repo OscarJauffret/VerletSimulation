@@ -29,9 +29,8 @@ struct VerletObject {
 
     void updatePosition(double dt) {
         const Vector2<double> velocity = position - previousPosition;
-        const double VELOCITY_DAMPING = 40.0f;
         previousPosition = position;
-        position = position + velocity + (acceleration - velocity * VELOCITY_DAMPING) * dt * dt;
+        position = position + velocity + (acceleration - velocity) * dt * dt;
         acceleration = {};
 
         trail.emplace_back(position, color);
