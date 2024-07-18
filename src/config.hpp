@@ -9,10 +9,10 @@
 using namespace sf;
 
 namespace config {
-    const Vector2f gravity = {0.0f, 1000.0f};
-    constexpr int32_t windowWidth = 1000;
-    constexpr int32_t windowHeight = 800;
-    constexpr uint32_t fps = 60;
+    const Vector2<double> gravity = {0.0f, 1000.0f};
+    constexpr double windowWidth = 1000;
+    constexpr double windowHeight = 900;
+    constexpr uint32_t fps = 144;
 }
 
 #endif //VERLETSIMULATION_CONFIG_HPP

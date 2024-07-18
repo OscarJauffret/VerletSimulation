@@ -14,41 +14,41 @@ using namespace sf;
 using namespace std;
 
 class Solver {
-    Vector2f gravity = config::gravity;
+    Vector2<double> gravity = config::gravity;
     uint32_t subSteps = 1;
-    Vector2f constraintCenter;
-    float constraintRadius = 100.0f;
-    Vector2f centerOfGravity;
-    float centerOfGravityRadius;
+    Vector2<double> constraintCenter;
+    double constraintRadius = 100.0f;
+    Vector2<double> centerOfGravity;
+    double centerOfGravityRadius;
     vector<VerletObject> objects;
-    float time = 0.0f;
-    float frameDt = 0.0f;
+    double time = 0.0f;
+    double frameDt = 0.0f;
 
 public:
     Solver() = default;
-    uint64_t addObject(sf::Vector2f position, float radius, int64_t constrainedToId = -1, bool renderTrail = false);
+    uint64_t addObject(Vector2<double> position, double radius, int64_t constrainedToId = -1, bool renderTrail = false, Color color = Color::White);
     void setSubSteps(uint32_t steps);
     void setSimulationUpdateRate(uint32_t rate);
-    void setConstraint(Vector2f center, float radius);
-    void setObjectVelocity(VerletObject& object, Vector2f velocity);
+    void setConstraint(Vector2<double> center, double radius);
+    void setObjectVelocity(VerletObject& object, Vector2<double> velocity);
 
     [[nodiscard]] const vector<VerletObject>& getObjects() const;
-    [[nodiscard]] float getStepDt() const;
+    [[nodiscard]] double getStepDt() const;
 
-    [[nodiscard]] float getTime() const;
+    [[nodiscard]] double getTime() const;
     [[nodiscard]] uint64_t getObjectsCount() const;
-    [[nodiscard]] Vector3f getConstraint(int64_t i = -1) const;
+    [[nodiscard]] Vector3<double> getConstraint(int64_t i = -1) const;
 
     void update();
-    void updatePositions(float dt);
+    void updatePositions(double dt);
     void applyGravity();
     void applyConstraint();
     void applyCircleConstraint();
-    void checkCollisions(float dt);
+    void checkCollisions(double dt);
 
     void updateGravity();
-    void setGravity(Vector2f center, float radius);
-    [[nodiscard]] Vector3f getGravity() const;
+    void setGravity(Vector2<double> center, double radius);
+    [[nodiscard]] Vector3<double> getGravity() const;
 };
 
 

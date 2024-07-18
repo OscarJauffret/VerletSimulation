@@ -4,8 +4,9 @@
 
 #include "headers/solver.hpp"
 
-uint64_t Solver::addObject(sf::Vector2f position, float radius, int64_t constrainedToId, bool renderTrail) {
-    objects.emplace_back(position, radius, constrainedToId, renderTrail);
+uint64_t
+Solver::addObject(Vector2<double> position, double radius, int64_t constrainedToId, bool renderTrail, Color color) {
+    objects.emplace_back(position, radius, constrainedToId, renderTrail, color);
     return objects.size() - 1;
 }
 
@@ -14,13 +15,13 @@ void Solver::update() {
     const float stepDt = getStepDt();
     for (uint32_t i{subSteps}; i--;) {
         applyGravity();
-        checkCollisions(0);
+//        checkCollisions(0);
         applyCircleConstraint();
         updatePositions(stepDt);
     }
 }
 
-void Solver::updatePositions(float dt) {
+void Solver::updatePositions(double dt) {
     for (auto& object : objects) {
         object.updatePosition(dt);
     }
@@ -34,47 +35,47 @@ void Solver::applyGravity() {
 
 void Solver::applyConstraint() {
     for (auto& obj: objects) {
-        const Vector2f distance = constraintCenter - obj.position;
-        const float dist = sqrt(distance.x * distance.x + distance.y * distance.y);
+        const Vector2<double> distance = constraintCenter - obj.position;
+        const double dist = sqrt(distance.x * distance.x + distance.y * distance.y);
         if (dist > constraintRadius - obj.radius) {
-            const Vector2f normal = distance / dist;
+            const Vector2<double> normal = distance / dist;
             obj.position = constraintCenter - normal * (constraintRadius - obj.radius);
         }
     }
 }
 
 void Solver::applyCircleConstraint() {
-    Vector2f center;
+    Vector2<double> center;
     for (auto& obj: objects) {
         center = constraintCenter;
         if (obj.constrainedToId != -1) {
             center = objects[obj.constrainedToId].position;
         }
-        const Vector2f distance = center - obj.position;
-        const float dist = sqrt(distance.x * distance.x + distance.y * distance.y);
+        const Vector2<double> distance = center - obj.position;
+        const double dist = sqrt(distance.x * distance.x + distance.y * distance.y);
         if (dist != constraintRadius - obj.radius) {
-            const Vector2f normal = distance / dist;
+            const Vector2<double> normal = distance / dist;
             obj.position = center - normal * (constraintRadius - obj.radius);
         }
     }
 }
 
-void Solver::checkCollisions(float dt) {
-    const float responseCoef = 0.75f;
+void Solver::checkCollisions(double dt) {
+    const double responseCoef = 0.75f;
     const uint64_t size = objects.size();
     for (uint64_t i{0}; i < size; ++i) {
         VerletObject& obj1 = objects[i];
         for (uint64_t k{i + 1}; k < size; ++k) {
             VerletObject& obj2 = objects[k];
-            const sf::Vector2f v        = obj1.position - obj2.position;
-            const float        dist2    = v.x * v.x + v.y * v.y;
-            const float        minDist = obj1.radius + obj2.radius;
+            const sf::Vector2<double> v = obj1.position - obj2.position;
+            const double dist2 = v.x * v.x + v.y * v.y;
+            const double minDist = obj1.radius + obj2.radius;
             if (dist2 < minDist * minDist) {
-                const float        dist  = sqrt(dist2);
-                const sf::Vector2f n     = v / dist;
-                const float mass_ratio_1 = obj1.radius / (obj1.radius + obj2.radius);
-                const float mass_ratio_2 = obj2.radius / (obj1.radius + obj2.radius);
-                const float delta        = 0.5f * responseCoef * (dist - minDist);
+                const double dist  = sqrt(dist2);
+                const sf::Vector2<double> n = v / dist;
+                const double mass_ratio_1 = obj1.radius / (obj1.radius + obj2.radius);
+                const double mass_ratio_2 = obj2.radius / (obj1.radius + obj2.radius);
+                const double delta = 0.5f * responseCoef * (dist - minDist);
                 // Update positions
                 obj1.position -= n * (mass_ratio_2 * delta);
                 obj2.position += n * (mass_ratio_1 * delta);
