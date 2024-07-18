@@ -9,29 +9,16 @@
 #include "sim/headers/solver.hpp"
 
 using namespace sf;
+#define M_PI 3.14159265358979323846f
 
 class Renderer {
+    const Color constraintColor = Color(80, 80, 80);
+    const float thickness = 2.0f;
 public:
     explicit
     Renderer(RenderTarget& target) : m_target{target} {}
 
     void render(const Solver& solver) const {
-        const sf::Vector3f constraint = solver.getConstraint();
-        sf::CircleShape constraint_background{constraint.z};
-        constraint_background.setOrigin(constraint.z, constraint.z);
-        constraint_background.setFillColor(sf::Color::Black);
-        constraint_background.setPosition(constraint.x, constraint.y);
-        constraint_background.setPointCount(128);
-        m_target.draw(constraint_background);
-
-        const Vector3f gravity = solver.getGravity();
-        sf::CircleShape gravity_background{gravity.z};
-        gravity_background.setOrigin(gravity.z, gravity.z);
-        gravity_background.setFillColor(sf::Color::White);
-        gravity_background.setPosition(gravity.x, gravity.y);
-        gravity_background.setPointCount(128);
-//        m_target.draw(gravity_background);
-
         sf::CircleShape circle{1.0f};
         circle.setPointCount(32);
         circle.setOrigin(1.0f, 1.0f);
@@ -41,6 +28,27 @@ public:
             circle.setScale(obj.radius, obj.radius);
             circle.setFillColor(obj.color);
             m_target.draw(circle);
+            Vector3f constraint = solver.getConstraint(obj.constrainedToId);
+            Vector2f direction = {constraint.x - obj.position.x, constraint.y - obj.position.y};
+            float length = sqrt(direction.x * direction.x + direction.y * direction.y);
+            float angle = atan2(direction.y, direction.x) * 180 / M_PI;
+
+            sf::RectangleShape line;
+            line.setSize({length, thickness}); // Set the desired thickness
+            line.setOrigin(0, thickness / 2);
+            line.setPosition(obj.position);
+            line.setRotation(angle);
+            line.setFillColor(constraintColor);
+
+            m_target.draw(line);
+
+            if (obj.renderTrail) {
+                for (const auto &[trailPosition, trailColor]: obj.trail) {
+                    circle.setPosition(trailPosition);
+                    circle.setFillColor(trailColor);
+                    m_target.draw(circle);
+                }
+            }
         }
     }
 

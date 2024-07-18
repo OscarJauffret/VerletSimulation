@@ -28,8 +28,11 @@ void Solver::setObjectVelocity(VerletObject &object, sf::Vector2f velocity) {
     object.setVelocity(velocity, getStepDt());
 }
 
-Vector3f Solver::getConstraint() const {
-    return {constraintCenter.x, constraintCenter.y, constraintRadius};
+Vector3f Solver::getConstraint(int64_t i) const {
+    if (i < 0) {
+        return {constraintCenter.x, constraintCenter.y, constraintRadius};
+    }
+    return {objects[i].position.x, objects[i].position.y, constraintRadius};
 }
 
 uint64_t Solver::getObjectsCount() const {

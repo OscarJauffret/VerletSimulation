@@ -26,7 +26,7 @@ class Solver {
 
 public:
     Solver() = default;
-    VerletObject &addObject(sf::Vector2f position, float radius);
+    uint64_t addObject(sf::Vector2f position, float radius, int64_t constrainedToId = -1, bool renderTrail = false);
     void setSubSteps(uint32_t steps);
     void setSimulationUpdateRate(uint32_t rate);
     void setConstraint(Vector2f center, float radius);
@@ -34,9 +34,10 @@ public:
 
     [[nodiscard]] const vector<VerletObject>& getObjects() const;
     [[nodiscard]] float getStepDt() const;
-    [[nodiscard]] Vector3f getConstraint() const;
+
     [[nodiscard]] float getTime() const;
     [[nodiscard]] uint64_t getObjectsCount() const;
+    [[nodiscard]] Vector3f getConstraint(int64_t i = -1) const;
 
     void update();
     void updatePositions(float dt);

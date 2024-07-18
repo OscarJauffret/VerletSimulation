@@ -4,9 +4,9 @@
 
 #include "headers/solver.hpp"
 
-VerletObject &Solver::addObject(sf::Vector2f position, float radius) {
-    objects.emplace_back(position, radius);
-    return objects.back();
+uint64_t Solver::addObject(sf::Vector2f position, float radius, int64_t constrainedToId, bool renderTrail) {
+    objects.emplace_back(position, radius, constrainedToId, renderTrail);
+    return objects.size() - 1;
 }
 
 void Solver::update() {
@@ -14,9 +14,7 @@ void Solver::update() {
     const float stepDt = getStepDt();
     for (uint32_t i{subSteps}; i--;) {
         applyGravity();
-//        updateGravity();
         checkCollisions(0);
-//        applyConstraint();
         applyCircleConstraint();
         updatePositions(stepDt);
     }
@@ -46,12 +44,17 @@ void Solver::applyConstraint() {
 }
 
 void Solver::applyCircleConstraint() {
+    Vector2f center;
     for (auto& obj: objects) {
-        const Vector2f distance = constraintCenter - obj.position;
+        center = constraintCenter;
+        if (obj.constrainedToId != -1) {
+            center = objects[obj.constrainedToId].position;
+        }
+        const Vector2f distance = center - obj.position;
         const float dist = sqrt(distance.x * distance.x + distance.y * distance.y);
         if (dist != constraintRadius - obj.radius) {
             const Vector2f normal = distance / dist;
-            obj.position = constraintCenter - normal * (constraintRadius - obj.radius);
+            obj.position = center - normal * (constraintRadius - obj.radius);
         }
     }
 }
